@@ -3,10 +3,23 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, AddRecordForm
 from .models import Record
+from django.db.models import Q
 
 
 def home(request):
-    records = Record.objects.filter(created_by=request.user)
+    query = request.GET.get('q')  # Get the search term
+    if query:
+        records = Record.objects.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query) |
+            Q(phone__icontains=query) |
+            Q(city__icontains=query) |
+            Q(state__icontains=query) |
+            Q(address__icontains=query)
+        )
+    else:
+        records = Record.objects.filter(created_by=request.user)
 
     # Check to see if user is logging in
     if request.method == 'POST':
@@ -42,7 +55,7 @@ def register_user(request):
             password = form.cleaned_data['password1']
             user = authenticate(username=username, password=password)
             login(request, user)
-            messages.success(request,  "You Have Successfully Registered! Welcome!")
+            messages.success(request, "You Have Successfully Registered! Welcome!")
             return redirect('home')
     else:
         form = SignUpForm()
