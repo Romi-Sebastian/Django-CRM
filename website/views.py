@@ -6,7 +6,7 @@ from .models import Record
 
 
 def home(request):
-    records = Record.objects.all()
+    records = Record.objects.filter(created_by=request.user)
 
     # Check to see if user is logging in
     if request.method == 'POST':
@@ -77,7 +77,9 @@ def add_record(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             if form.is_valid():
-                form.save()
+                record = form.save(commit=False)
+                record.created_by = request.user
+                record.save()
                 messages.success(request, "Record Added..")
                 return redirect('home')
         return render(request, 'add_record.html', {'form': form})
