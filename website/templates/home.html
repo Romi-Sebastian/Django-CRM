@@ -3,6 +3,16 @@
 {% block content %}
 
 {% if user.is_authenticated %}
+
+    <form method="GET" action="{% url 'home' %}" class="mb-3 d-flex justify-content-end" style="max-width: 300px; margin-left: auto;">
+        <input type="text" name="q" placeholder="Search..." class="form-control me-2" value="{{ request.GET.q }}">
+        <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+
+    {% if request.GET.q %}
+        <p>Showing results for <strong>"{{ request.GET.q }}"</strong></p>
+    {% endif %}
+
     <table class="table table-striped table-hover table-bordered">
         <thead class="table-dark">
             <tr>
