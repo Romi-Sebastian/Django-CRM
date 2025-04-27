@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     env:
       DJANGO_DB_NAME: mydb
@@ -32,10 +32,11 @@ jobs:
           sudo apt-get install -y mysql-server
           sudo systemctl start mysql
           sudo systemctl enable mysql
-          sudo mysql -e "CREATE DATABASE mydb;"
-          sudo mysql -e "CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'mypassword';"
-          sudo mysql -e "GRANT ALL PRIVILEGES on mydb.* TO 'myuser'@'localhost';"
-          sudo mysql -e "FLUSH PRIVILEGES;"
+          sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
+          sudo mysql -u root -proot -e "CREATE DATABASE mydb;"
+          sudo mysql -u root -proot -e "CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'mypassword';"
+          sudo mysql -u root -proot -e "GRANT ALL PRIVILEGES on mydb.* TO 'myuser'@'localhost';"
+          sudo mysql -u root -proot -e "FLUSH PRIVILEGES;"
 
       - name: Install dependencies
         run: | 
