@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': os.getenv('DJANGO_DB_NAME', 'razecrm'),
         'USER': os.getenv('DJANGO_DB_USER', 'root'),
         'PASSWORD': os.getenv('DJANGO_DB_PASSWORD', 'root'),
-        'HOST': os.getenv('DJANGO_DB_HOST', 'root'),
+        'HOST': os.getenv('DJANGO_DB_HOST', '127.0.0.1 '),
         'PORT': '3306'
     }
 }

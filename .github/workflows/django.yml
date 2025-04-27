@@ -4,18 +4,34 @@ on:
   push:
     branches: [ main ]
   pull_request:
-      branches: [ main ]
+    branches: [ main ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: mydb
+          MYSQL_USER: myuser
+          MYSQL_PASSWORD: mypassword
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     env:
       DJANGO_DB_NAME: mydb
       DJANGO_DB_USER: myuser
       DJANGO_DB_PASSWORD: mypassword
-      DJANGO_DB_HOST: localhost
+      DJANGO_DB_HOST: 127.0.0.1
+      DJANGO_DB_PORT: 3306
 
     steps:
       - name: Checkout code
@@ -26,22 +42,15 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Setup MySQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mysql-server
-          sudo systemctl start mysql
-          sudo systemctl enable mysql
-          sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
-          sudo mysql -u root -proot -e "CREATE DATABASE mydb;"
-          sudo mysql -u root -proot -e "CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'mypassword';"
-          sudo mysql -u root -proot -e "GRANT ALL PRIVILEGES on mydb.* TO 'myuser'@'localhost';"
-          sudo mysql -u root -proot -e "FLUSH PRIVILEGES;"
-
       - name: Install dependencies
-        run: | 
+        run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Wait for MySQL
+        run: |
+          echo "Waiting for MySQL to be ready..."
+          sleep 20
 
       - name: Run migrations
         run: |
