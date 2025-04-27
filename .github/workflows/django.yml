@@ -11,6 +11,12 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      DJANGO_DB_NAME: mydb
+      DJANGO_DB_USER: myuser
+      DJANGO_DB_PASSWORD: mypassword
+      DJANGO_DB_HOST: localhost
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,12 +42,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Setup Database
-        env:
-          DJANGO_DB_NAME: mydb
-          DJANGO_DB_USER: myuser
-          DJANGO_DB_PASSWORD: mypassword
-          DJANGO_DB_HOST: localhost
+      - name: Run migrations
         run: |
           python manage.py migrate
 
