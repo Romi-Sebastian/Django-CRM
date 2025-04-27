@@ -7,19 +7,22 @@ from django.db.models import Q
 
 
 def home(request):
-    query = request.GET.get('q')  # Get the search term
-    if query:
-        records = Record.objects.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(email__icontains=query) |
-            Q(phone__icontains=query) |
-            Q(city__icontains=query) |
-            Q(state__icontains=query) |
-            Q(address__icontains=query)
-        )
-    else:
-        records = Record.objects.filter(created_by=request.user)
+    records = None
+
+    if request.user.is_authenticated:
+        query = request.GET.get('q')  # Get the search term
+        if query:
+            records = Record.objects.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(email__icontains=query) |
+                Q(phone__icontains=query) |
+                Q(city__icontains=query) |
+                Q(state__icontains=query) |
+                Q(address__icontains=query)
+            )
+        else:
+            records = Record.objects.filter(created_by=request.user)
 
     # Check to see if user is logging in
     if request.method == 'POST':
