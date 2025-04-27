@@ -20,10 +20,30 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup MySQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-server
+          sudo systemctl start mysql
+          sudo systemctl enable mysql
+          sudo mysql -e "CREATE DATABASE mydb;"
+          sudo mysql -e "CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'mypassword';"
+          sudo mysql -e "GRANT ALL PRIVILEGES on mydb.* TO 'myuser'@'localhost';"
+          sudo mysql -e "FLUSH PRIVILEGES;"
+
       - name: Install dependencies
         run: | 
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Setup Database
+        env:
+          DJANGO_DB_NAME: mydb
+          DJANGO_DB_USER: myuser
+          DJANGO_DB_PASSWORD: mypassword
+          DJANGO_DB_HOST: localhost
+        run: |
+          python manage.py migrate
 
       - name: Run migrations
         run: |
