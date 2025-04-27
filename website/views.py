@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import SignUpForm, AddRecordForm
 from .models import Record
@@ -116,3 +117,11 @@ def update_record(request, pk):
     else:
         messages.success(request, "You Must Be Logged In To Update A Record")
         return redirect('home')
+
+
+@login_required
+def profile_view(request):
+    user = request.user
+    user_records = Record.objects.filter(created_by=user)
+
+    return render(request, 'profile.html', {'user': user, 'records': user_records})
