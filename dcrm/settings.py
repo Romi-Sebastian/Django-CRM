@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,10 +78,10 @@ WSGI_APPLICATION = 'dcrm.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'razecrm',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
+        'NAME': config('DJANGO_DB_NAME', default=''),
+        'USER': config('DJANGO_DB_USER', default=''),
+        'PASSWORD': config('DJANGO_DB_PASSWORD', default=''),
+        'HOST': config('DJANGO_DB_HOST', default='127.0.0.1'),
         'PORT': '3306'
     }
 }
