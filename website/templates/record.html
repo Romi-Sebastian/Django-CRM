@@ -25,4 +25,55 @@
 
 <a href="{% url 'update' record.id %}" class="btn btn-secondary">Update Record</a>
 
+<br/><br/>
+<hr>
+<br/><br/>
+
+<h4>Add a Note</h4>
+<form method="post" class="mb-4">
+  {% csrf_token %}
+  <div class="form-group">
+    {{ form.content.label_tag }}
+    {{ form.content }}
+  </div>
+  <button type="submit" class="btn btn-primary">Add Note</button>
+</form>
+
+<h4>Notes</h4>
+
+{% if latest_notes %}
+  {% for note in latest_notes %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <p class="card-text">{{ note.content }}</p>
+        <p class="card-subtitle text-muted">
+          <small>By {{ note.author.username }} on {{ note.created_at|date:"M d, Y H:i" }}</small>
+        </p>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if older_notes %}
+  <a class="btn btn-sm btn-outline-secondary mb-2" data-bs-toggle="collapse" href="#olderNotes" role="button" aria-expanded="false" aria-controls="olderNotes">
+    Show older notes
+  </a>
+
+  <div class="collapse" id="olderNotes">
+    {% for note in older_notes %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="card-text">{{ note.content }}</p>
+          <p class="card-subtitle text-muted">
+            <small>By {{ note.author.username }} on {{ note.created_at|date:"M d, Y H:i" }}</small>
+          </p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% elif not latest_notes %}
+  <p class="text-muted">No notes added yet.</p>
+{% endif %}
+
+
 {% endblock %}
