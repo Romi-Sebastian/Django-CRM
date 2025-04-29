@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from .models import Record
+from .models import Record, Note
 
 
 class RecordTestCase(TestCase):
@@ -41,3 +41,17 @@ class RecordTestCase(TestCase):
         # Check if searching works
         response = self.client.get('/?q=Test')
         self.assertEqual(response.status_code, 200)
+
+    def test_note_creation(self):
+        self.client.login(username='testuser', password='testpass')
+
+        note = Note.objects.create(
+            record=self.record,
+            author=self.user,
+            content="Test note"
+        )
+
+        self.assertEqual(Note.objects.count(), 1)
+        self.assertEqual(note.record, self.record)
+        self.assertEqual(note.author, self.user)
+        self.assertEqual(note.content, "Test note")

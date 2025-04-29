@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm
+from .forms import SignUpForm, AddRecordForm, NoteForm
 from .models import Record
 from django.db.models import Q
 
@@ -69,13 +69,34 @@ def register_user(request):
 
 
 def customer_record(request, pk):
-    if request.user.is_authenticated:
-        # Look up records
-        record = Record.objects.get(id=pk)
-        return render(request, 'record.html', {'record': record})
-    else:
+    if not request.user.is_authenticated:
         messages.success(request, "You Must Be Logged In To View That Page...")
         return redirect('home')
+
+    record = Record.objects.get(id=pk)
+    all_notes = record.notes.order_by('-created_at')  # Latest first
+    latest_notes = all_notes[:2]
+    older_notes = all_notes[2:]
+
+    # Handle note submission
+    if request.method == 'POST':
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.record = record
+            note.author = request.user
+            note.save()
+            messages.success(request, "Note added.")
+            return redirect('record', pk=pk)
+    else:
+        form = NoteForm()
+
+    return render(request, 'record.html', {
+        'record': record,
+        'latest_notes': latest_notes,
+        'older_notes': older_notes,
+        'form': form
+    })
 
 
 def delete_record(request, pk):
