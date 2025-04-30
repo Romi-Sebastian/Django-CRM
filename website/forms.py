@@ -58,6 +58,15 @@ class AddRecordForm(forms.ModelForm):
         attrs={'placeholder': 'State', 'class': 'form-control'}), label='')
     zipcode = forms.CharField(required=True, widget=forms.widgets.TextInput(
         attrs={'placeholder': 'Zipcode', 'class': 'form-control'}), label='')
+    category = forms.ChoiceField(choices=[
+        ('lead', 'Lead'),
+        ('client', 'Client'),
+        ('vendor', 'Vendor'),
+        ('partner', 'Partner'),
+        ('other', 'Other'),
+        ],
+        widget=forms.Select(attrs={'class': 'form-control'}), required=True, label=''
+    )
 
     class Meta:
         model = Record

@@ -24,6 +24,7 @@
                 <th scope="col">State</th>
                 <th scope="col">Zipcode</th>
                 <th scope="col">Created At</th>
+                <th scope="col">Tag</th>
                 <th scope="col">ID</th>
             </tr>
         </thead>
@@ -39,6 +40,7 @@
                         <td>{{ record.state }}</td>
                         <td>{{ record.zipcode }}</td>
                         <td>{{ record.created_at }}</td>
+                        <td>{{ record.category }}</td>
                         <td><a href="{% url 'record' record.id %}">{{ record.id }}</a></td>
                         <br/><br/>
                     </tr>
