@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -161,3 +161,11 @@ def profile_view(request):
     user_records = Record.objects.filter(created_by=user)
 
     return render(request, 'profile.html', {'user': user, 'records': user_records})
+
+
+@login_required
+def toggle_task_completion(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    task.is_completed = not task.is_completed
+    task.save()
+    return redirect('record', pk=task.record.id)

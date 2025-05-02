@@ -19,11 +19,11 @@
 
 <br/><br/>
 
-<a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+<a href="{% url 'home' %}" class="btn btn-primary">Back</a>
 
 <a href="{% url 'delete' record.id %}" class="btn btn-danger">Delete</a>
 
-<a href="{% url 'update' record.id %}" class="btn btn-secondary">Update Record</a>
+<a href="{% url 'update' record.id %}" class="btn btn-primary">Update Record</a>
 
 <br/><br/>
 <hr>
@@ -35,20 +35,25 @@
   <ul class="list-group mb-3">
     {% for task in tasks %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{ task.title }}
-        <span class="badge
-          {% if task.completed %}
-            bg-success
+        <div>
+          {{ task.title }}
+          <br>
+          <small class="text-muted">
+            {% if task.completed %}
+              Completed on {{ task.due_date|date:"M d, Y" }}
+            {% else %}
+              Due: {{ task.due_date|date:"M d, Y" }}
+            {% endif %}
+          </small>
+        </div>
+
+        <div>
+          {% if not task.is_completed %}
+            <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-success">Mark as Done</a>
           {% else %}
-            bg-warning
+            <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-secondary">Undo</a>
           {% endif %}
-        ">
-          {% if task.completed %}
-            Completed
-          {% else %}
-            Due: {{ task.due_date|date:"M d, Y" }}
-          {% endif %}
-        </span>
+        </div>
       </li>
     {% endfor %}
   </ul>
