@@ -49,9 +49,13 @@
 
         <div>
           {% if not task.is_completed %}
-            <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-success">Mark as Done</a>
+            <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-success">
+              <i class="bi bi-check-circle"></i> Complete
+            </a>
           {% else %}
-            <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-secondary">Undo</a>
+            <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-arrow-counterclockwise">Reopen</i>
+            </a>
           {% endif %}
           <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
           <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger"
