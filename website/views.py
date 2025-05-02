@@ -169,3 +169,28 @@ def toggle_task_completion(request, task_id):
     task.is_completed = not task.is_completed
     task.save()
     return redirect('record', pk=task.record.id)
+
+
+@login_required
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Task Updated.")
+            return redirect('record', pk=task.record.id)
+    else:
+        form = TaskForm(instance=task)
+
+    return render(request, 'edit_task.html', {'form': form, 'task': task})
+
+
+@login_required
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    task.delete()
+    messages.success(request, "Task Deleted.")
+    return redirect('record', pk=task.record.id)
+
