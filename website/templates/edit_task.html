@@ -11,10 +11,13 @@
 </form>
 
 <script>
-  flatpickr("#id_due_date", {
-    enableTime: true,
-    dateFormat: "Y-m-d H:i",
-    time_24hr: true
+  document.addEventListener("DOMContentLoaded", function() {
+    flatpickr("#id_due_date", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      time_24hr: true,
+      minDate: "today",
+    });
   });
 </script>
 

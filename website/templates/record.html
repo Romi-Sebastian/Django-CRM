@@ -50,7 +50,7 @@
         <div>
           {% if not task.is_completed %}
             <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-success">
-              <i class="bi bi-check-circle"></i> Complete
+              <i class="bi bi-check-circle"></i> Mark as Complete
             </a>
           {% else %}
             <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-secondary">
@@ -131,7 +131,8 @@
     flatpickr("#id_due_date", {
       enableTime: true,
       dateFormat: "Y-m-d H:i",
-      time_24hr: true
+      time_24hr: true,
+      minDate: "today",
     });
   });
 </script>
