@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .constants import  CATEGORY_CHOICES
+from .constants import CATEGORY_CHOICES
 
 
 class Record(models.Model):
@@ -28,3 +28,15 @@ class Note(models.Model):
 
     def __str__(self):
         return f"Note by {self.author} on {self.created_at.strftime('%Y-%m-%d')}"
+
+
+class Task(models.Model):
+    record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name='tasks')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    due_date = models.DateTimeField()
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} ({'Done' if self.is_completed else 'Pending'})"

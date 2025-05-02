@@ -29,12 +29,49 @@
 <hr>
 <br/><br/>
 
+<h4>Tasks</h4>
+
+{% if tasks %}
+  <ul class="list-group mb-3">
+    {% for task in tasks %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ task.title }}
+        <span class="badge
+          {% if task.completed %}
+            bg-success
+          {% else %}
+            bg-warning
+          {% endif %}
+        ">
+          {% if task.completed %}
+            Completed
+          {% else %}
+            Due: {{ task.due_date|date:"M d, Y" }}
+          {% endif %}
+        </span>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No tasks added yet.</p>
+{% endif %}
+
+
+<h5>Add Task</h5>
+<form method="post">
+  {% csrf_token %}
+  {{ task_form.as_p }}
+  <button type="submit" class="btn btn-primary">Add Task</button>
+</form>
+
+<hr>
+
 <h4>Add a Note</h4>
 <form method="post" class="mb-4">
   {% csrf_token %}
   <div class="form-group">
-    {{ form.content.label_tag }}
-    {{ form.content }}
+    {{ note_form.content.label_tag }}
+    {{ note_form.content }}
   </div>
   <button type="submit" class="btn btn-primary">Add Note</button>
 </form>
@@ -75,5 +112,15 @@
   <p class="text-muted">No notes added yet.</p>
 {% endif %}
 
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    flatpickr("#id_due_date", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      time_24hr: true
+    });
+  });
+</script>
 
 {% endblock %}
+
