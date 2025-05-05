@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.timezone import now
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -110,7 +112,8 @@ def customer_record(request, pk):
         'older_notes': older_notes,
         'tasks': tasks,
         'note_form': note_form,
-        'task_form': task_form
+        'task_form': task_form,
+        'now': now(),
     })
 
 
