@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from .models import Record, Note
+from .models import Record, Note, Task
 
 
 class RecordTestCase(TestCase):
@@ -55,3 +55,19 @@ class RecordTestCase(TestCase):
         self.assertEqual(note.record, self.record)
         self.assertEqual(note.author, self.user)
         self.assertEqual(note.content, "Test note")
+
+    def test_task_creation(self):
+        self.client.login(username='testuser', password='testpass')
+
+        task = Task.objects.create(
+            record=self.record,
+            user=self.user,
+            title="Test title",
+            due_date='2026-12-25 12:00:00'
+        )
+
+        self.assertEqual(Task.objects.count(), 1)
+        self.assertEqual(task.record, self.record)
+        self.assertEqual(task.user, self.user)
+        self.assertEqual(task.title, 'Test title')
+        self.assertEqual(task.due_date, '2026-12-25 12:00:00')

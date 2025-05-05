@@ -10,6 +10,9 @@ urlpatterns = [
     path('delete_record/<int:pk>', views.delete_record, name='delete'),
     path('add_record/', views.add_record, name='add'),
     path('update_record/<int:pk>', views.update_record, name='update'),
-    path('profile/', views.profile_view, name='profile')
+    path('profile/', views.profile_view, name='profile'),
+    path('toggle_task/<int:task_id>', views.toggle_task_completion, name='toggle_task'),
+    path('edit_task/<int:task_id>', views.edit_task, name='edit_task'),
+    path('delete_task/<int:task_id>', views.delete_task, name='delete_task')
 
 ]

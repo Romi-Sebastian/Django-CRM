@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from .models import Record, Note
+from .models import Record, Note, Task
 
 
 class SignUpForm(UserCreationForm):
@@ -79,4 +79,20 @@ class NoteForm(forms.ModelForm):
         fields = ['content']
         widgets = {
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Add a note..'}),
+        }
+
+
+class TaskForm(forms.ModelForm):
+
+    due_date = forms.DateTimeField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Select due date & time',
+        'id': 'id_due_date',  # This is important for JS selector
+    }))
+
+    class Meta:
+        model = Task
+        fields = ['title', 'due_date']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'eg: Call John Doe'}),
         }

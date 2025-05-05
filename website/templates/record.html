@@ -19,22 +19,76 @@
 
 <br/><br/>
 
-<a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+<a href="{% url 'home' %}" class="btn btn-primary">Back</a>
 
 <a href="{% url 'delete' record.id %}" class="btn btn-danger">Delete</a>
 
-<a href="{% url 'update' record.id %}" class="btn btn-secondary">Update Record</a>
+<a href="{% url 'update' record.id %}" class="btn btn-primary">Update Record</a>
 
 <br/><br/>
 <hr>
 <br/><br/>
 
+<h4>Tasks</h4>
+
+{% if tasks %}
+  <ul class="list-group mb-3">
+    {% for task in tasks %}
+      <li class="list-group-item d-flex justify-content-between align-items-center
+        {% if not task.is_completed and task.due_date < now %}
+          list-group-item-warning
+        {% endif %}">
+        <div>
+          {{ task.title }}
+          <br>
+          <small class="text-muted">
+            {% if task.completed %}
+              Completed on {{ task.due_date|date:"M d, Y" }}
+            {% else %}
+              Due: {{ task.due_date|date:"M d, Y" }}
+            {% endif %}
+          </small>
+        </div>
+
+        <div>
+          {% if not task.is_completed %}
+            <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-success">
+              <i class="bi bi-check-circle"></i> Mark as Complete
+            </a>
+          {% else %}
+            <a href="{% url 'toggle_task' task.id %}" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-arrow-counterclockwise">Reopen</i>
+            </a>
+          {% endif %}
+          <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+          <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger"
+            onclick="return confirm('Are you sure you want to delete this task?');">
+          Delete
+          </a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No tasks added yet.</p>
+{% endif %}
+
+
+<h5>Add Task</h5>
+<form method="post">
+  {% csrf_token %}
+  {{ task_form.as_p }}
+  <button type="submit" class="btn btn-primary">Add Task</button>
+</form>
+
+<hr>
+
 <h4>Add a Note</h4>
 <form method="post" class="mb-4">
   {% csrf_token %}
   <div class="form-group">
-    {{ form.content.label_tag }}
-    {{ form.content }}
+    {{ note_form.content.label_tag }}
+    {{ note_form.content }}
   </div>
   <button type="submit" class="btn btn-primary">Add Note</button>
 </form>
@@ -75,5 +129,16 @@
   <p class="text-muted">No notes added yet.</p>
 {% endif %}
 
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    flatpickr("#id_due_date", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      time_24hr: true,
+      minDate: "today",
+    });
+  });
+</script>
 
 {% endblock %}
+

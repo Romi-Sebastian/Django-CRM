@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.timezone import now
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm, NoteForm
-from .models import Record
+from .forms import SignUpForm, AddRecordForm, NoteForm, TaskForm
+from .models import Record, Task
 from django.db.models import Q
 
 
@@ -77,25 +79,41 @@ def customer_record(request, pk):
     all_notes = record.notes.order_by('-created_at')  # Latest first
     latest_notes = all_notes[:2]
     older_notes = all_notes[2:]
+    tasks = record.tasks.order_by('due_date')
+
+    note_form = NoteForm()
+    task_form = TaskForm()
 
     # Handle note submission
     if request.method == 'POST':
-        form = NoteForm(request.POST)
-        if form.is_valid():
-            note = form.save(commit=False)
-            note.record = record
-            note.author = request.user
-            note.save()
-            messages.success(request, "Note added.")
-            return redirect('record', pk=pk)
-    else:
-        form = NoteForm()
+        if 'content' in request.POST:
+            note_form = NoteForm(request.POST)
+            if note_form.is_valid():
+                note = note_form.save(commit=False)
+                note.record = record
+                note.author = request.user
+                note.save()
+                messages.success(request, "Note added.")
+                return redirect('record', pk=pk)
+
+        elif 'title' in request.POST:
+            task_form = TaskForm(request.POST)
+            if task_form.is_valid():
+                task = task_form.save(commit=False)
+                task.record = record
+                task.user = request.user
+                task.save()
+                messages.success(request, "Task created.")
+                return redirect('record', pk=pk)
 
     return render(request, 'record.html', {
         'record': record,
         'latest_notes': latest_notes,
         'older_notes': older_notes,
-        'form': form
+        'tasks': tasks,
+        'note_form': note_form,
+        'task_form': task_form,
+        'now': now(),
     })
 
 
@@ -146,3 +164,36 @@ def profile_view(request):
     user_records = Record.objects.filter(created_by=user)
 
     return render(request, 'profile.html', {'user': user, 'records': user_records})
+
+
+@login_required
+def toggle_task_completion(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    task.is_completed = not task.is_completed
+    task.save()
+    return redirect('record', pk=task.record.id)
+
+
+@login_required
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Task Updated.")
+            return redirect('record', pk=task.record.id)
+    else:
+        form = TaskForm(instance=task)
+
+    return render(request, 'edit_task.html', {'form': form, 'task': task})
+
+
+@login_required
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    task.delete()
+    messages.success(request, "Task Deleted.")
+    return redirect('record', pk=task.record.id)
+
