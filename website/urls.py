@@ -13,6 +13,8 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('toggle_task/<int:task_id>', views.toggle_task_completion, name='toggle_task'),
     path('edit_task/<int:task_id>', views.edit_task, name='edit_task'),
-    path('delete_task/<int:task_id>', views.delete_task, name='delete_task')
+    path('delete_task/<int:task_id>', views.delete_task, name='delete_task'),
+    path('note/edit/<int:pk>', views.edit_note, name='edit_note'),
+    path('note/delete_note/<int:pk>', views.delete_note, name='delete_note')
 
 ]
