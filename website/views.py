@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import SignUpForm, AddRecordForm, NoteForm, TaskForm
-from .models import Record, Task
+from .models import Record, Task, Note
 from django.db.models import Q
 
 
@@ -197,3 +197,26 @@ def delete_task(request, task_id):
     messages.success(request, "Task Deleted.")
     return redirect('record', pk=task.record.id)
 
+
+@login_required
+def edit_note(request, pk):
+    note = get_object_or_404(Note, id=pk)
+
+    if request.method == 'POST':
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Note Updated.")
+            return redirect('record', pk=note.record.id)
+    else:
+        form = NoteForm(instance=note)
+
+    return render(request, 'edit_note.html', {'form': form, 'note': note})
+
+
+@login_required
+def delete_note(request, pk):
+    note = get_object_or_404(Note, id=pk)
+    note.delete()
+    messages.success(request, "Note Deleted.")
+    return redirect('record', pk=note.record.id)
