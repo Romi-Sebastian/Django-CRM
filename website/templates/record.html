@@ -95,6 +95,25 @@
 
 <h4>Notes</h4>
 
+{% if pinned_notes %}
+  <h5>Pinned Notes</h5>
+  {% for note in pinned_notes %}
+    <div class="card mb-3 border-warning">
+      <div class="card-body">
+        <p class="card-text">{{ note.content }}</p>
+        <p class="card-subtitle text-muted">
+          <small>By {{ note.author.username }} on {{ note.created_at|date:"M d, Y H:i" }}</small>
+        </p>
+        <div class="mt-2 d-flex gap-2">
+          <a href="{% url 'edit_note' note.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+          <a href="{% url 'delete_note' note.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this note?');">Delete</a>
+          <a href="{% url 'toggle_pin_note' note.id %}" class="btn btn-sm btn-outline-warning">Unpin</a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
 {% if latest_notes %}
   {% for note in latest_notes %}
     <div class="card mb-3">
@@ -102,12 +121,11 @@
         <div class="d-flex justify-content-between">
          <p class="card-text mb-1">{{ note.content }}</p>
          <div class="btn-group btn-group-sm">
-           <a href="{% url 'edit_note' note.id %}" class="btn btn-outline-primary">
-            <i class="bi bi-pencil-square"></i> Edit
-           </a>
+           <a href="{% url 'edit_note' note.id %}" class="btn btn-outline-primary">Edit</a>
            <a href="{% url 'delete_note' note.id %}" class="btn btn-outline-danger"
-             onclick="return confirm('Are you sure you want to delete this note?');">
-            <i class="bi bi-trash"></i> Delete
+             onclick="return confirm('Are you sure you want to delete this note?');">Delete</a>
+           <a href="{% url 'toggle_pin_note' note.id %}" class="btn btn-outline-warning">
+             <i class="bi bi-pin"></i> Pin
            </a>
          </div>
       </div>
@@ -131,12 +149,11 @@
       <div class="d-flex justify-content-between">
         <p class="card-text mb-1">{{ note.content }}</p>
         <div class="btn-group btn-group-sm">
-          <a href="{% url 'edit_note' note.id %}" class="btn btn-outline-primary">
-            <i class="bi bi-pencil-square"></i> Edit
-          </a>
+          <a href="{% url 'edit_note' note.id %}" class="btn btn-outline-primary">Edit</a>
           <a href="{% url 'delete_note' note.id %}" class="btn btn-outline-danger"
-             onclick="return confirm('Are you sure you want to delete this note?');">
-            <i class="bi bi-trash"></i> Delete
+             onclick="return confirm('Are you sure you want to delete this note?');">Delete</a>
+          <a href="{% url 'toggle_pin_note' note.id %}" class="btn btn-outline-warning">
+             <i class="bi bi-pin"></i> Pin
           </a>
         </div>
       </div>

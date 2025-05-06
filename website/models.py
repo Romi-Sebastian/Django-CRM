@@ -25,6 +25,7 @@ class Note(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    is_pinned = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Note by {self.author} on {self.created_at.strftime('%Y-%m-%d')}"

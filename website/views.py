@@ -76,7 +76,8 @@ def customer_record(request, pk):
         return redirect('home')
 
     record = Record.objects.get(id=pk)
-    all_notes = record.notes.order_by('-created_at')  # Latest first
+    all_notes = record.notes.filter(is_pinned=False).order_by('-created_at')  # Latest first
+    pinned_notes = record.notes.filter(is_pinned=True).order_by('-created_at')
     latest_notes = all_notes[:2]
     older_notes = all_notes[2:]
     tasks = record.tasks.order_by('due_date')
@@ -108,6 +109,7 @@ def customer_record(request, pk):
 
     return render(request, 'record.html', {
         'record': record,
+        'pinned_notes': pinned_notes,
         'latest_notes': latest_notes,
         'older_notes': older_notes,
         'tasks': tasks,
@@ -219,4 +221,11 @@ def delete_note(request, pk):
     note = get_object_or_404(Note, id=pk)
     note.delete()
     messages.success(request, "Note Deleted.")
+    return redirect('record', pk=note.record.id)
+
+
+def toggle_pin_note(request, note_id):
+    note = get_object_or_404(Note, id=note_id)
+    note.is_pinned = not note.is_pinned
+    note.save()
     return redirect('record', pk=note.record.id)
