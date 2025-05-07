@@ -164,9 +164,17 @@ def update_record(request, pk):
 @login_required
 def profile_view(request):
     user = request.user
-    user_records = Record.objects.filter(created_by=user)
+    records = Record.objects.filter(created_by=user)
+    tasks = Task.objects.filter(user=user)
+    task_count = tasks.count()
+    completed_task_count = tasks.filter(is_completed=True).count()
 
-    return render(request, 'profile.html', {'user': user, 'records': user_records})
+    return render(request, 'profile.html', {
+        'user': user,
+        'records': records,
+        'task_count': task_count,
+        'completed_task_count': completed_task_count,
+    })
 
 
 @login_required
