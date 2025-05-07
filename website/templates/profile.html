@@ -2,25 +2,53 @@
 {% block content %}
 
 <div class="container mt-4">
-  <h2>User Profile</h2>
+  <h2>
+    Welcome,
+    {% if user.first_name %}
+      {{ user.first_name }}
+    {% else %}
+      {{ user.username }}
+    {% endif %}
+  </h2>
   <hr>
-  <div class="card p-3 mb-4">
-    <p><strong>Username: </strong>{{ user.username }}</p>
-    <p><strong>Name: </strong>{{ user.first_name }} {{ user.last_name }}</p>
-    <p><strong>Email: </strong>{{ user.email }}</p>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card p-3 mb-4 shadow-sm">
+        <h5 class="card-title">Your Info</h5>
+          <p><strong>Username: </strong>{{ user.username }}</p>
+          <p><strong>Name: </strong>{{ user.first_name }} {{ user.last_name }}</p>
+          <p><strong>Email: </strong>{{ user.email }}</p>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3 mb-4 shadow-sm">
+          <h5 class="card-title">Quick Stats</h5>
+          <p><strong>Total Records:</strong> {{ records.count }}</p>
+          <p><strong>Total Tasks:</strong> {{ task_count }}</p>
+          <p><strong>Completed Tasks:</strong> {{ completed_task_count }}</p>
+        </div>
+    </div>
   </div>
 
-  <h4>Your Records ({{ records.count }})</h4>
-  <ul class="list-group">
-    {% for record in records %}
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <a href="{% url 'record' record.id %}" >{{ record }}</a>
-      </li>
-    {% empty %}
-      <li class="list-group-item">No records yet.</li>
-    {% endfor %}
-  </ul>
+  <div class="card p-3 shadow-sm">
+    <h5 class="card-title mb-3">Recent Records</h5>
+    {% if records %}
+      <ul class="list-group list-group-flush">
+        {% for record in records|slice:":5" %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ record.first_name }} {{ record.last_name }}</span>
+          <a href="{% url 'record' record.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">You haven't created any records yet.</p>
+    {% endif %}
+  </div>
 </div>
+
 
 
 {% endblock %}
