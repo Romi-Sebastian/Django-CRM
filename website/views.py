@@ -22,7 +22,8 @@ def home(request):
                 Q(phone__icontains=query) |
                 Q(city__icontains=query) |
                 Q(state__icontains=query) |
-                Q(address__icontains=query)
+                Q(address__icontains=query),
+                created_by=request.user
             )
         else:
             records = Record.objects.filter(created_by=request.user)
