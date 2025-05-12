@@ -8,5 +8,3 @@ services:
     envVars:
       - key: WEB_CONCURRENCY
         value: 4
-
-
