@@ -4,7 +4,7 @@ services:
     name: django-crm-app
     runtime: python
     buildCommand: './build.sh'
-    startCommand: 'python -m gunicorn dcrm.asgi:application -k uvicorn.worker.UvicornWorker'
+    startCommand: 'python -m gunicorn dcrm.asgi:application -k uvicorn.workers.UvicornWorker'
     envVars:
       - key: WEB_CONCURRENCY
         value: 4
