@@ -20,3 +20,5 @@ Contributing:
 Pull requests are welcome.
 
 Note: This is an ongoing project — more features and UI improvements will be added.
+
+https://django-crm-app-u75n.onrender.com/
