@@ -17,6 +17,8 @@ jobs:
       DJANGO_DB_PASSWORD: ${{ secrets.DJANGO_DB_PASSWORD }}
       DJANGO_DB_HOST: ${{ secrets.DJANGO_DB_HOST }}
       DJANGO_DB_PORT: 5432
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: ''
 
     services:
       postgres:
