@@ -20,3 +20,6 @@ Contributing:
 Pull requests are welcome.
 
 Note: This is an ongoing project — more features and UI improvements will be added.
+
+Demo: https://django-crm-app-u75n.onrender.com/
+Note that there will be a 50 sec delay since render sleeps free services after 15 mins of inactivity.
