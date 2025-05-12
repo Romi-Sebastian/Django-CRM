@@ -8,6 +8,8 @@ from .forms import SignUpForm, AddRecordForm, NoteForm, TaskForm
 from .models import Record, Task, Note
 from django.db.models import Q
 
+from .constants import MAX_RECORDS_PER_USER
+
 
 def home(request):
     records = None
@@ -132,6 +134,10 @@ def delete_record(request, pk):
 
 
 def add_record(request):
+    if Record.objects.filter(created_by=request.user).count() >= MAX_RECORDS_PER_USER:
+        messages.warning(request, "You've Reached The Record Creation Limit")
+        return redirect('home')
+
     form = AddRecordForm(request.POST or None)
     if request.user.is_authenticated:
         if request.method == 'POST':

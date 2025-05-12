@@ -5,3 +5,5 @@ CATEGORY_CHOICES = [
         ('partner', 'Partner'),
         ('other', 'Other'),
     ]
+
+MAX_RECORDS_PER_USER = 10
