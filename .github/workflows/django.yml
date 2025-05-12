@@ -11,29 +11,47 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DJANGO_DB_ENGINE: django.db.backends.mysql
+      DJANGO_DB_ENGINE: django.db.backends.postgresql
       DJANGO_DB_NAME: ${{ secrets.DJANGO_DB_NAME }}
       DJANGO_DB_USER: ${{ secrets.DJANGO_DB_USER }}
       DJANGO_DB_PASSWORD: ${{ secrets.DJANGO_DB_PASSWORD }}
       DJANGO_DB_HOST: ${{ secrets.DJANGO_DB_HOST }}
-      DJANGO_DB_PORT: 3307
+      DJANGO_DB_PORT: 5432
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: ${{ secrets.DJANGO_DB_NAME }}
+          POSTGRES_USER: ${{ secrets.DJANGO_DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DJANGO_DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.11'
 
-      - name: Start MySQL
-        run: |
-          sudo /etc/init.d/mysql start
-          mysql -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DJANGO_DB_NAME }};" -u${{ secrets.DJANGO_DB_USER }} -p${{ secrets.DJANGO_DB_PASSWORD }}
-
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Wait for Postgres to be ready
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            echo "Waiting for postgres.."
+            sleep 1
+          done
 
       - name: Run Migrations
         run: python manage.py migrate
