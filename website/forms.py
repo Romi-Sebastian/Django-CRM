@@ -2,6 +2,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
 from .models import Record, Note, Task
+from django_recaptcha.fields import ReCaptchaField
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
 
 class SignUpForm(UserCreationForm):
@@ -11,6 +13,7 @@ class SignUpForm(UserCreationForm):
         attrs={'class': 'form-control', 'placeholder': 'First Name'}))
     last_name = forms.CharField(label="", max_length="50", widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Last Name'}))
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
 
     class Meta:
         model = User
