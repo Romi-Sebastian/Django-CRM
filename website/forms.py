@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from .models import Record, Note, Task
+from .models import Record, Note, Task, RecordFile
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
@@ -99,3 +99,14 @@ class TaskForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'eg: Call John Doe'}),
         }
+
+
+class RecordFileForm(forms.ModelForm):
+    description = forms.CharField(required=False, widget=forms.widgets.TextInput(
+        attrs={'placeholder': 'Optional: File description', 'class': 'form-control'}), label='Description')
+    file = forms.FileField(widget=forms.widgets.ClearableFileInput(
+        attrs={'class': 'form-control'}), label='File')
+
+    class Meta:
+        model = RecordFile
+        fields = ['file', 'description']

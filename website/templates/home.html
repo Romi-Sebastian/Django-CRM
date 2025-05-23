@@ -13,13 +13,35 @@
         You have <strong>{{ records|length }}</strong> contact{{ records|length|pluralize }}
     </div>
 
-    <form method="GET" action="{% url 'home' %}" class="input-group mb-4" style="max-width: 400px; margin-left: auto;">
-        <input type="text" name="q" placeholder="Search contacts..." class="form-control" value="{{ request.GET.q }}">
-        <button type="submit" class="btn btn-outline-secondary">Search</button>
+    <form method="GET" action="{% url 'home' %}" class="mb-4">
+        <div class="row g-2">
+            <div class="col-md">
+                <input type="text" name="q" placeholder="Search contacts..." class="form-control" value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-auto">
+                <select name="category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for value, display_name in category_choices %}
+                        <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>{{ display_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary">Filter/Search</button>
+            </div>
+        </div>
     </form>
 
-    {% if request.GET.q %}
-        <p>Showing results for <strong>"{{ request.GET.q }}"</strong></p>
+    {% if request.GET.q or selected_category %}
+        <p>
+            Showing results
+            {% if request.GET.q %}
+                for <strong>"{{ request.GET.q }}"</strong>
+            {% endif %}
+            {% if selected_category %}
+                in category <strong>"{{ selected_category|capfirst }}"</strong>
+            {% endif %}
+        </p>
     {% endif %}
 
     <div class="table-responsive">
