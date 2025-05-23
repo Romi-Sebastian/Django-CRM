@@ -41,3 +41,34 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.title} ({'Done' if self.is_completed else 'Pending'})"
+
+
+class RecordFile(models.Model):
+    record = models.ForeignKey(Record, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='record_files/%Y/%m/')
+    description = models.CharField(max_length=255, blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.file.name
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    link = models.URLField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.title}"
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    receive_email_notifications = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.user.username

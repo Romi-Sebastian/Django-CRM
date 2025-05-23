@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Your Notifications</h2>
+        <a href="{% url 'mark_all_notifications_as_read' %}" class="btn btn-outline-primary btn-sm">Mark all as read</a>
+    </div>
+
+    {% if notifications %}
+        <ul class="list-group">
+            {% for notification in notifications %}
+                <li class="list-group-item {% if not notification.is_read %}list-group-item-light fw-bold{% else %}list-group-item-secondary{% endif %} mb-2">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ notification.title }}</h5>
+                        <small>{{ notification.created_at|timesince }} ago</small>
+                    </div>
+                    <p class="mb-1">{{ notification.message }}</p>
+                    <small class="text-muted">
+                        {% if notification.link %}
+                            <a href="{% url 'mark_notification_as_read' notification.id %}" class="btn btn-sm btn-link p-0">
+                                View Details & Mark Read
+                            </a>
+                        {% else %}
+                            {% if not notification.is_read %}
+                            <a href="{% url 'mark_notification_as_read' notification.id %}" class="btn btn-sm btn-outline-secondary p-0 px-1">
+                                Mark as Read
+                            </a>
+                            {% else %}
+                            <span class="badge bg-light text-dark">Read</span>
+                            {% endif %}
+                        {% endif %}
+                    </small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            You have no notifications.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

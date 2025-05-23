@@ -16,6 +16,10 @@ urlpatterns = [
     path('delete_task/<int:task_id>', views.delete_task, name='delete_task'),
     path('note/edit/<int:pk>', views.edit_note, name='edit_note'),
     path('note/delete_note/<int:pk>', views.delete_note, name='delete_note'),
-    path('note/<int:note_id>/pin/', views.toggle_pin_note, name='toggle_pin_note')
+    path('note/<int:note_id>/pin/', views.toggle_pin_note, name='toggle_pin_note'),
 
+    # Notification URLs
+    path('notifications/', views.view_all_notifications, name='view_all_notifications'),
+    path('notification/mark_read/<int:notification_id>/', views.mark_notification_as_read, name='mark_notification_as_read'),
+    path('notifications/mark_all_read/', views.mark_all_notifications_as_read, name='mark_all_notifications_as_read'),
 ]

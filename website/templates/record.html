@@ -17,7 +17,9 @@
   <div class="card-body">
     <div class="row mb-3">
       <div class="col-md-6">
-       <p><i class="bi bi-envelope"></i> <strong>Email:</strong> {{ record.email }}</p>
+       <p><i class="bi bi-envelope"></i> <strong>Email:</strong> {{ record.email }}
+         <a href="mailto:{{ record.email }}" class="btn btn-secondary btn-sm">Send Email</a>
+       </p>
        <p><i class="bi bi-telephone"></i> <strong>Phone:</strong> {{ record.phone }}</p>
       </div>
       <div class="col-md-6">
@@ -101,7 +103,7 @@
 <form method="post">
   {% csrf_token %}
   {{ task_form.as_p }}
-  <button type="submit" class="btn btn-primary">Add Task</button>
+  <button type="submit" name="submit_task" class="btn btn-primary">Add Task</button>
 </form>
 
 <hr>
@@ -113,7 +115,7 @@
     {{ note_form.content.label_tag }}
     {{ note_form.content }}
   </div>
-  <button type="submit" class="btn btn-primary">Add Note</button>
+  <button type="submit" name="submit_note" class="btn btn-primary">Add Note</button>
 </form>
 
 <h4>Notes</h4>
@@ -191,6 +193,42 @@
 {% elif not latest_notes %}
   <p class="text-muted">No notes added yet.</p>
 {% endif %}
+
+<hr>
+
+<h4>File Attachments</h4>
+
+{% if record_files %}
+  <ul class="list-group mb-3">
+    {% for file in record_files %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <a href="{{ file.file.url }}" target="_blank">{{ file.file.name|cut:"record_files/" }}</a>
+          {% if file.description %}
+            <br><small class="text-muted">{{ file.description }}</small>
+          {% endif %}
+          <br><small class="text-muted">
+            Uploaded by: {{ file.uploaded_by.username|default:"Unknown" }} on {{ file.uploaded_at|date:"M d, Y H:i" }}
+          </small>
+        </div>
+        <div>
+          {# Placeholder for delete button for file #}
+          <a href="#" class="btn btn-sm btn-outline-danger">Delete</a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No files attached yet.</p>
+{% endif %}
+
+<h5>Upload File</h5>
+<form method="post" enctype="multipart/form-data" class="mb-4">
+  {% csrf_token %}
+  {{ record_file_form.as_p }}
+  <button type="submit" name="submit_file" class="btn btn-primary">Upload File</button>
+</form>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {

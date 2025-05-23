@@ -1,34 +1,42 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.timezone import now
+from django.http import HttpResponseRedirect # For redirecting back
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import SignUpForm, AddRecordForm, NoteForm, TaskForm
-from .models import Record, Task, Note
+from .forms import SignUpForm, AddRecordForm, NoteForm, TaskForm, RecordFileForm
+from .models import Record, Task, Note, RecordFile, Notification
 from django.db.models import Q
 
-from .constants import MAX_RECORDS_PER_USER
+from .constants import MAX_RECORDS_PER_USER, CATEGORY_CHOICES
 
 
 def home(request):
     records = None
+    selected_category = None
 
     if request.user.is_authenticated:
         query = request.GET.get('q')  # Get the search term
+        selected_category = request.GET.get('category') # Get the selected category
+
+        filters = Q(created_by=request.user)
+
         if query:
-            records = Record.objects.filter(
+            filters &= (
                 Q(first_name__icontains=query) |
                 Q(last_name__icontains=query) |
                 Q(email__icontains=query) |
                 Q(phone__icontains=query) |
                 Q(city__icontains=query) |
                 Q(state__icontains=query) |
-                Q(address__icontains=query),
-                created_by=request.user
+                Q(address__icontains=query)
             )
-        else:
-            records = Record.objects.filter(created_by=request.user)
+
+        if selected_category:
+            filters &= Q(category=selected_category)
+        
+        records = Record.objects.filter(filters)
 
     # Check to see if user is logging in
     if request.method == 'POST':
@@ -45,7 +53,12 @@ def home(request):
             messages.success(request, 'There Was An Error Logging In, Please Try Again..')
             return redirect('home')
     else:
-        return render(request, 'home.html', {'records': records})
+        context = {
+            'records': records,
+            'category_choices': CATEGORY_CHOICES,
+            'selected_category': selected_category,
+        }
+        return render(request, 'home.html', context)
 
 
 def logout_user(request):
@@ -84,13 +97,15 @@ def customer_record(request, pk):
     latest_notes = all_notes[:2]
     older_notes = all_notes[2:]
     tasks = record.tasks.order_by('due_date')
+    record_files = record.files.all().order_by('-uploaded_at')
 
     note_form = NoteForm()
     task_form = TaskForm()
+    record_file_form = RecordFileForm()
 
-    # Handle note submission
     if request.method == 'POST':
-        if 'content' in request.POST:
+        # Check which form was submitted. We'll use button names or specific field checks.
+        if 'submit_note' in request.POST: # Assuming 'submit_note' is the name of the note form submit button
             note_form = NoteForm(request.POST)
             if note_form.is_valid():
                 note = note_form.save(commit=False)
@@ -100,7 +115,7 @@ def customer_record(request, pk):
                 messages.success(request, "Note added.")
                 return redirect('record', pk=pk)
 
-        elif 'title' in request.POST:
+        elif 'submit_task' in request.POST: # Assuming 'submit_task' is the name of the task form submit button
             task_form = TaskForm(request.POST)
             if task_form.is_valid():
                 task = task_form.save(commit=False)
@@ -109,8 +124,21 @@ def customer_record(request, pk):
                 task.save()
                 messages.success(request, "Task created.")
                 return redirect('record', pk=pk)
+        
+        elif 'submit_file' in request.POST: # Assuming 'submit_file' is the name of the file form submit button
+            record_file_form = RecordFileForm(request.POST, request.FILES)
+            if record_file_form.is_valid():
+                record_file = record_file_form.save(commit=False)
+                record_file.record = record
+                record_file.uploaded_by = request.user
+                record_file.save()
+                messages.success(request, "File uploaded successfully.")
+                return redirect('record', pk=pk)
+            else:
+                messages.error(request, "Error uploading file. Please check the form.")
 
-    return render(request, 'record.html', {
+
+    context = {
         'record': record,
         'pinned_notes': pinned_notes,
         'latest_notes': latest_notes,
@@ -118,8 +146,11 @@ def customer_record(request, pk):
         'tasks': tasks,
         'note_form': note_form,
         'task_form': task_form,
+        'record_file_form': record_file_form,
+        'record_files': record_files,
         'now': now(),
-    })
+    }
+    return render(request, 'record.html', context)
 
 
 def delete_record(request, pk):
@@ -244,3 +275,30 @@ def toggle_pin_note(request, note_id):
     note.is_pinned = not note.is_pinned
     note.save()
     return redirect('record', pk=note.record.id)
+
+
+@login_required
+def view_all_notifications(request):
+    all_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'notifications.html', {'notifications': all_notifications})
+
+
+@login_required
+def mark_notification_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.is_read = True
+    notification.save()
+
+    if notification.link:
+        return HttpResponseRedirect(notification.link)
+    
+    # Fallback if no link or prefer to always go to notifications page after marking read from there
+    # Or use request.META.get('HTTP_REFERER', reverse('view_all_notifications'))
+    return redirect('view_all_notifications') 
+
+
+@login_required
+def mark_all_notifications_as_read(request):
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    messages.success(request, "All notifications marked as read.")
+    return redirect('view_all_notifications')
